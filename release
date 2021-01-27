@@ -24,6 +24,8 @@ ORDERED=$(./generate-list $ROS_PACKAGES)
 rm -rf packages
 git clone git@bitbucket.org:acrv/rv_package_list.git packages
 
+mkdir -p $WORKSPACE/target
+
 if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
         rm $WORKSPACE/target/robotics-sources.yaml
 fi
