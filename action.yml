@@ -1,0 +1,10 @@
+name: "Setup ROS environment"
+description: |
+  Install system dependencies required to build ROS and ROS 2 packages
+author: "ROS Tooling Working Group"
+branding:
+  icon: "box"
+  color: "gray-dark"
+runs:
+  using: 'node12'
+  main: 'index.js'

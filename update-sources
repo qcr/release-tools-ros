@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+from __future__ import print_function
+
+import sys
+import os
+import yaml
+
+sources = sys.argv[1]
+package = sys.argv[2]
+apt_name = sys.argv[3]
+
+with open(sources) as f:
+	data = yaml.load(f)
+
+	if not data:
+		data = {}
+
+	if package not in data:
+		data[package] = {}
+
+	if 'ubuntu' not in data[package]:
+		data[package]['ubuntu'] = []
+
+	if apt_name not in data[package]['ubuntu']:
+		data[package]['ubuntu'].append(apt_name)
+
+with open(sources, 'w') as f:
+	yaml.dump(data, f)
+	print('Written update to', sources)
+
+

@@ -1,0 +1,100 @@
+#!/bin/bash
+
+function handler {
+  exit 1
+}
+
+function clean_up {
+        fakeroot debian/rules clean
+        find debian/ -not -name 'pre*' -not -name 'post*' -delete &>/dev/null
+}
+
+trap handler SIGINT
+
+set_difference () {
+   sort $1 $2 $2 | uniq -u
+}
+
+WORKSPACE=$PWD
+
+ROS_PACKAGES=$(dirname $(find src/ | grep package.xml$) 2>/dev/null)
+
+ORDERED=$(./generate-list $ROS_PACKAGES)
+
+rm -rf packages
+git clone git@bitbucket.org:acrv/rv_package_list.git packages
+
+if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
+        rm $WORKSPACE/target/robotics-sources.yaml
+fi
+
+ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml
+
+if [ "$?" != "0" ]; then
+	echo "Failed to create link to $(lsb_release -cs) sources list"
+	clean_up
+	exit 1
+fi
+
+apt-get update
+apt-get -y upgrade
+
+DATE=$(date "+%Y%m%d")
+TIME=$(date "+%H%M%S")
+
+for i in $ORDERED
+do
+	pushd $i
+
+	PACKAGE_NAME=$(cat package.xml | grep -o "<name>[^<]*" | awk '{print substr($1,7)}')
+	echo "Building $PACKAGE_NAME"
+
+	sudo -u $SUDO_USER rosdep update
+	rosdep install -y --from-paths .
+
+	bloom-generate rosdebian
+
+	if [ "$?" != "0" ]; then
+		echo "Failed to build package in $i"
+		clean_up
+		exit 1
+	fi
+
+	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
+	sed -i 's/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic"/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic" -DCMAKE_BUILD_TYPE=Release/g' debian/rules
+
+	fakeroot debian/rules binary
+
+	if [ "$?" != "0" ]; then
+		echo "Failed to build package in $i"
+		clean_up
+		exit 1
+	fi
+
+	clean_up
+
+	cd ..
+
+	ARTEFACT=$(ls | grep *.deb)
+	APT_PACKAGE_NAME=$(dpkg --field $ARTEFACT | grep "Package: " | awk '{print $2}')
+
+	dpkg --install $ARTEFACT
+
+	$WORKSPACE/update-sources $WORKSPACE/target/robotics-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
+
+	mv *.deb $WORKSPACE/target/
+
+	popd
+done
+
+git config --global user.email "g.suddrey@qut.edu.au"
+git config --global user.name "Gavin Suddrey"
+
+pushd $WORKSPACE/packages
+git add .
+git commit -m "Update generated - $(date)"
+git push
+popd
+
+chown -R 1000:1000 $WORKSPACE
+

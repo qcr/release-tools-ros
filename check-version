@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+import os
+import sys
+import yaml
+
+path = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(path, 'versions.yml'), 'r') as f:
+   data = yaml.load(f, Loader=yaml.BaseLoader)
+
+   if sys.argv[1] not in data:
+       sys.exit(0)
+
+   if sys.argv[2] > data[sys.argv[1]]:
+       sys.exit(0)
+
+sys.exit(1)
