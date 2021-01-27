@@ -6,10 +6,10 @@ async function run() {
 		"bash",
 		["-c", 'ls -la']
 	);
-    await exec.exec(
-		"bash",
-		["-c", './release']
-	);
+    // await exec.exec(
+	// 	"bash",
+	// 	["-c", './release']
+	// );
 }
 
 run();
