@@ -17,6 +17,8 @@ set_difference () {
 
 WORKSPACE=$PWD
 
+ln -s $GITHUB_WORKSPACE  src
+
 ROS_PACKAGES=$(dirname $(find src/ | grep package.xml$) 2>/dev/null)
 
 ORDERED=$(./generate-list $ROS_PACKAGES)
