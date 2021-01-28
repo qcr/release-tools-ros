@@ -2,14 +2,11 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 
 async function run() {
+    console.log(__dirname)
     await exec.exec(
-		"bash",
-		["-c", 'ls -la']
+	 	"bash",
+	 	["-c", `ln ${__dirname}/release /usr/bin/release`]
 	);
-    // await exec.exec(
-	// 	"bash",
-	// 	["-c", './release']
-	// );
 }
 
 run();
