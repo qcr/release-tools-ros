@@ -24,7 +24,7 @@ done
 WORKSPACE="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 echo $PWD
-ls -la $GITHUB_WORKSPACE
+ls -la $PWD
 echo 'Copying'
 ln -s $GITHUB_WORKSPACE $WORKSPACE/src
 echo "Copied workspace with result $?"
