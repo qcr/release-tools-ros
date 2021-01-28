@@ -24,8 +24,10 @@ done
 WORKSPACE="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 echo $WORKSPACE
 
+ls -la $GITHUB_WORKSPACE
 ln -s $GITHUB_WORKSPACE $WORKSPACE/src
-
+ls -la $WORKSPACE
+exit 0
 ROS_PACKAGES=$(dirname $(find $WORKSPACE/src/ | grep package.xml$) 2>/dev/null)
 
 ORDERED=$($WORKSPACE/generate-list $ROS_PACKAGES)
