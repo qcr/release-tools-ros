@@ -3,7 +3,7 @@ const exec = require('@actions/exec');
 
 async function run() {
     const distro = core.getInput('ros-distro');
-    const dependencies = ['python-bloom', 'python-stdeb', 'dh-make']
+    const dependencies = ['python3-bloom', 'python3-stdeb', 'dh-make']
 
     await exec.exec(
 		'sudo',
