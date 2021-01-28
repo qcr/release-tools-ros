@@ -2,10 +2,10 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 
 async function run() {
-    console.log(__dirname)
+    const distro = core.getInput('ros-distro');
     await exec.exec(
-	 	"bash",
-	 	["-c", `sudo ${__dirname}/release`]
+	 	'sudo',
+	 	['bash', '-c', `source /opt/ros/${distro}/setup.bash && ${__dirname}/release`]
 	);
 }
 
