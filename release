@@ -31,7 +31,7 @@ ROS_PACKAGES=$(dirname $(find $WORKSPACE/src/ | grep package.xml$) 2>/dev/null)
 ORDERED=$($WORKSPACE/generate-list $ROS_PACKAGES)
 
 rm -rf packages
-git clone git@bitbucket.org:acrv/rv_package_list.git packages
+git clone https://github.com/qcr/package_lists packages
 
 mkdir -p $WORKSPACE/target
 
@@ -97,15 +97,6 @@ do
 
 	popd
 done
-
-git config --global user.email "g.suddrey@qut.edu.au"
-git config --global user.name "Gavin Suddrey"
-
-pushd $WORKSPACE/packages
-git add .
-git commit -m "Update generated - $(date)"
-git push
-popd
 
 chown -R 1000:1000 $WORKSPACE
 
