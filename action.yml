@@ -1,10 +1,14 @@
-name: "Setup ROS environment"
+name: "Release ROS Package"
 description: |
-  Install system dependencies required to build ROS and ROS 2 packages
-author: "ROS Tooling Working Group"
+  Create a ROS debian
+author: "Gavin Suddrey"
 branding:
   icon: "box"
   color: "gray-dark"
+inputs:
+  ros-distro:  # id of input
+    description: 'ROS Distro Name (melodic,noetic,etc)'
+    required: true
 runs:
   using: 'node12'
   main: 'index.js'
