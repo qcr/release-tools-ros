@@ -46,7 +46,7 @@ if [ "$?" != "0" ]; then
 fi
 
 apt-get update
-apt-get -y upgrade
+rosdep update
 
 DATE=$(date "+%Y%m%d")
 TIME=$(date "+%H%M%S")
