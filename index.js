@@ -5,7 +5,7 @@ async function run() {
     console.log(__dirname)
     await exec.exec(
 	 	"bash",
-	 	["-c", `sudo ln -s ${__dirname}/release /usr/bin/release`]
+	 	["-c", `sudo ${__dirname}/release`]
 	);
 }
 
