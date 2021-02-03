@@ -18,7 +18,7 @@ async function run() {
         ['bash', '-c', `source /opt/ros/${distro}/setup.bash && ${__dirname}/release`]
     );
 	
-    const filenames = (await fsPromises.readdir('./target'))
+    const filenames = (await fsPromises.readdir(path.resolve(__dirname, 'target')))
         .filter(f => f.endsWith('.deb'))
         .map(f => path.resolve(__dirname, 'target', f))
 	
