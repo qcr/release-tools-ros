@@ -17,11 +17,14 @@ async function run() {
         'sudo',
         ['bash', '-c', `source /opt/ros/${distro}/setup.bash && ${__dirname}/release`]
     );
+
+    console.log(`Checking ${path.resolve(__dirname, 'target')} for binaries`)
 	
     const filenames = (await fsPromises.readdir(path.resolve(__dirname, 'target')))
         .filter(f => f.endsWith('.deb'))
         .map(f => path.resolve(__dirname, 'target', f))
 	
+    console.log(`Binaries: ${filenames}`);
     core.setOutput('files', filenames);
 }
 
