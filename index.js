@@ -11,7 +11,7 @@ async function run() {
     
     await exec.exec(
         'sudo',
-        'apt', 'install', '-y'].concat(dependencies)
+        ['apt', 'install', '-y'].concat(dependencies)
     );
     await exec.exec(
         'sudo',
