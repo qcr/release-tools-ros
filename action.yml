@@ -9,6 +9,9 @@ inputs:
   ros-distro:  # id of input
     description: 'ROS Distro Name (melodic,noetic,etc)'
     required: true
+outputs:
+  files:
+    description: 'File paths to generated artefacts'
 runs:
   using: 'node12'
   main: 'index.js'

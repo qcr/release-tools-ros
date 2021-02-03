@@ -1,8 +1,9 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const fs = require('fs');
+const path = require('path');
 
-const fsPromise = fs.promise;
+const fsPromises = fs.promises;
 
 async function run() {
     const distro = core.getInput('ros-distro');
@@ -17,10 +18,11 @@ async function run() {
         ['bash', '-c', `source /opt/ros/${distro}/setup.bash && ${__dirname}/release`]
     );
 	
-    const filenames = await fsPromise.readdir('./target').filter(f => f.endsWith('.deb'))
+    const filenames = (await fsPromises.readdir('./target'))
+        .filter(f => f.endsWith('.deb'))
+        .map(f => path.resolve(__dirname, 'target', f))
 	
     core.setOutput('files', filenames);
-    console.log(filenames)
 }
 
 run();
