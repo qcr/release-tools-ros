@@ -39,6 +39,8 @@ fi
 
 ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml
 
+echo "yaml file://$WORKSPACE/target/robotics-sources.yaml" >> /etc/ros/rosdep/sources.list.d/20-default.list
+
 if [ "$?" != "0" ]; then
 	echo "Failed to create link to $(lsb_release -cs) sources list"
 	clean_up
