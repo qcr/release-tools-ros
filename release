@@ -72,7 +72,11 @@ do
 	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
 	sed -i 's/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic"/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic" -DCMAKE_BUILD_TYPE=Release/g' debian/rules
 
-	fakeroot debian/rules binary
+	bloom-generate rosdebian --place-template-files
+	if [ -d templates ]; then
+		for f in $(ls templates/); do if [[ "$f" == *.em ]]; then cp templates/$f debian/$f; fi; done;
+	fi
+	bloom-generate rosdebian --process-template-files
 
 	if [ "$?" != "0" ]; then
 		echo "Failed to build package in $i"
