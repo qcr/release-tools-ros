@@ -61,7 +61,11 @@ do
 	sudo -u $SUDO_USER rosdep update
 	rosdep install -y --from-paths .
 
-	bloom-generate rosdebian
+	bloom-generate rosdebian --place-template-files
+	if [ -d templates ]; then
+		for f in $(ls templates/); do if [[ "$f" == *.em ]]; then cp templates/$f debian/$f; fi; done;
+	fi
+	bloom-generate rosdebian --process-template-files
 
 	if [ "$?" != "0" ]; then
 		echo "Failed to build package in $i"
@@ -71,13 +75,9 @@ do
 
 	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
 	sed -i 's/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic"/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic" -DCMAKE_BUILD_TYPE=Release/g' debian/rules
-
-	bloom-generate rosdebian --place-template-files
-	if [ -d templates ]; then
-		for f in $(ls templates/); do if [[ "$f" == *.em ]]; then cp templates/$f debian/$f; fi; done;
-	fi
-	bloom-generate rosdebian --process-template-files
-
+	
+	fakeroot debian/rules binary
+	
 	if [ "$?" != "0" ]; then
 		echo "Failed to build package in $i"
 		clean_up
