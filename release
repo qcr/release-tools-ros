@@ -95,6 +95,8 @@ do
 
 	dpkg --install $ARTEFACT
 
+	$WORKSPACE/update-sources $WORKSPACE/target/robotics-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
+	
 	mv *.deb $WORKSPACE/target/
 
 	popd
