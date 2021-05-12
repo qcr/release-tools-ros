@@ -36,8 +36,7 @@ if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
 fi
 
 wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/bionic/sources.yaml
-
-echo "yaml file://$WORKSPACE/target/robotics-sources.yaml" >> /etc/ros/rosdep/sources.list.d/20-default.list
+sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
 
 apt-get update
 rosdep update
