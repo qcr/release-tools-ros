@@ -35,8 +35,7 @@ if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
         rm $WORKSPACE/target/robotics-sources.yaml
 fi
 
-wget -o $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/bionic/sources.yaml
-cat $WORKSPACE/target/robotics-sources.yaml
+wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/bionic/sources.yaml
 
 echo "yaml file://$WORKSPACE/target/robotics-sources.yaml" >> /etc/ros/rosdep/sources.list.d/20-default.list
 
