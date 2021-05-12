@@ -37,6 +37,9 @@ if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
         rm $WORKSPACE/target/robotics-sources.yaml
 fi
 
+ls $WORKSPACE/packages
+
+echo "ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml"
 ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml
 
 if [ "$?" != "0" ]; then
