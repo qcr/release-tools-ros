@@ -28,8 +28,6 @@ ROS_PACKAGES=$(dirname $(find $WORKSPACE/src/ | grep package.xml$) 2>/dev/null)
 
 ORDERED=$($WORKSPACE/generate-list $ROS_PACKAGES)
 
-rm -rf packages
-git clone https://github.com/qcr/package_lists packages
 
 mkdir -p $WORKSPACE/target
 
@@ -37,17 +35,7 @@ if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
         rm $WORKSPACE/target/robotics-sources.yaml
 fi
 
-ls $WORKSPACE/packages
-
-echo "ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml"
-ln -s $WORKSPACE/packages/$(lsb_release -cs)/sources.yaml $WORKSPACE/target/robotics-sources.yaml
-
-if [ "$?" != "0" ]; then
-	echo "Failed to create link to $(lsb_release -cs) sources list"
-	clean_up
-	exit 1
-fi
-
+wget -o $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/bionic/sources.yaml
 cat $WORKSPACE/target/robotics-sources.yaml
 
 echo "yaml file://$WORKSPACE/target/robotics-sources.yaml" >> /etc/ros/rosdep/sources.list.d/20-default.list
