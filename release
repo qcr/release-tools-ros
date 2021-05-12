@@ -45,6 +45,8 @@ if [ "$?" != "0" ]; then
 	exit 1
 fi
 
+cat $WORKSPACE/target/robotics-sources.yaml
+
 echo "yaml file://$WORKSPACE/target/robotics-sources.yaml" >> /etc/ros/rosdep/sources.list.d/20-default.list
 
 apt-get update
