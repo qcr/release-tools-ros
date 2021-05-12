@@ -35,7 +35,7 @@ if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
         rm $WORKSPACE/target/robotics-sources.yaml
 fi
 
-wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/bionic/sources.yaml
+wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/$(lsb_release -sc)/sources.yaml
 sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
 
 apt-get update
@@ -67,7 +67,7 @@ do
 	fi
 
 	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
-	sed -i 's/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic"/-DCMAKE_INSTALL_PREFIX="\/opt\/ros\/melodic" -DCMAKE_BUILD_TYPE=Release/g' debian/rules
+	sed -i "s/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO'/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO' -DCMAKE_BUILD_TYPE=Release/g" debian/rules
 	
 	fakeroot debian/rules binary
 	
