@@ -52,7 +52,7 @@ do
 	PACKAGE_NAME=$(cat package.xml | grep -o "<name>[^<]*" | awk '{print substr($1,7)}')
 	echo "Building $PACKAGE_NAME"
 
-	sudo -u $SUDO_USER rosdep update
+	rosdep update
 	rosdep install -y --from-paths .
 
 	bloom-generate rosdebian --place-template-files
