@@ -38,6 +38,8 @@ fi
 wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/$(lsb_release -sc)/sources.yaml
 sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
 
+touch $WORKSPACE/target/local-sources.yaml
+
 apt-get update
 
 DATE=$(date "+%Y%m%d")
@@ -88,6 +90,7 @@ do
 	dpkg --install $ARTEFACT
 
 	$WORKSPACE/update-sources $WORKSPACE/target/robotics-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
+	$WORKSPACE/update-sources $WORKSPACE/target/local-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
 	
 	mv *.deb $WORKSPACE/target/
 

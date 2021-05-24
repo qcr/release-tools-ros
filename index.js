@@ -23,6 +23,7 @@ async function determineDistribCodename() {
 
 async function run() {
     const distro = core.getInput('ros-distro');
+
     let dependencies = ['python3-bloom', 'python3-stdeb', 'dh-make']
     
     const distribCodename = await determineDistribCodename();
@@ -45,8 +46,13 @@ async function run() {
         .filter(f => f.endsWith('.deb'))
         .map(f => path.resolve(__dirname, 'target', f))
 	
+    const packages = fs.readFileSync(path.resolve(__dirname, 'target', 'local-sources.yaml'), 'utf-8');
+
     console.log(`Binaries: ${filenames}`);
+    console.log(`Packages:\n${packages}`);
+    
     core.setOutput('files', filenames);
+    core.setOutput('packages', packages);
 }
 
 run();

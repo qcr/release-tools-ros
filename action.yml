@@ -12,6 +12,8 @@ inputs:
 outputs:
   files:
     description: 'File paths to generated artefacts'
+  packages:
+    description: 'Stringified YAML describing generated packages for distro'
 runs:
   using: 'node12'
   main: 'index.js'
