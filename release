@@ -79,11 +79,8 @@ do
 	fi
 
 	clean_up
-	echo "Here: $PWD"
 	cd ..
-	echo "Now here: $PWD"
-	ls -la
-
+	
 	ARTEFACT=$(ls | grep *.deb)
 	APT_PACKAGE_NAME=$(dpkg --field $ARTEFACT | grep "Package: " | awk '{print $2}')
 
