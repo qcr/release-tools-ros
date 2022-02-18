@@ -10,7 +10,7 @@ package = sys.argv[2]
 apt_name = sys.argv[3]
 
 with open(sources) as f:
-	data = yaml.load(f)
+	data = yaml.load(f, Loader=yaml.SafeLoader)
 
 	if not data:
 		data = {}
