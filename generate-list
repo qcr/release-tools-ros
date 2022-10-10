@@ -11,11 +11,15 @@ dependencies = {}
 paths = {}
 
 for package_dir in sys.argv[1:]:
-  with open(os.path.join(path, package_dir, 'CMakeLists.txt')) as f:
-    data = f.read()
+  try:
+    with open(os.path.join(path, package_dir, 'CMakeLists.txt')) as f:
+      data = f.read()
 
-    if 'cmake_minimum_required' not in data:
-      continue
+      if 'cmake_minimum_required' not in data:
+        continue
+  
+  except FileNotFoundError:
+    continue
     
   with open(os.path.join(path, package_dir, 'package.xml')) as f:
     data = f.read()
@@ -33,14 +37,22 @@ for package in dependencies:
   dependencies[package] = list(set(package_names).intersection(dependencies[package]))
 
 package_names.sort(key=lambda x: len(dependencies[x]))
-
 visited = []
+
+retries = {}
 
 while package_names:
   selected = package_names.pop(0)
 
   if len(dependencies[selected]) > 0:
-    raise Exception('Something went wrong. Perhaps a circular dependency?')
+    if not selected in retries:
+      retries[selected] = 5
+
+    if retries[selected] == 0:
+        raise Exception('Something went wrong. Perhaps a circular dependency?')
+    
+    retries[selected] -= 1
+      
 
   visited.append(selected)
 

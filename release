@@ -23,11 +23,14 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 WORKSPACE="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
+if [ -L "$WORKSPACE/src" ]; then
+	rm $WORKSPACE/src
+fi
+
 ln -s $PWD $WORKSPACE/src
 ROS_PACKAGES=$(dirname $(find $WORKSPACE/src/ | grep package.xml$) 2>/dev/null)
 
 ORDERED=$($WORKSPACE/generate-list $ROS_PACKAGES)
-
 
 mkdir -p $WORKSPACE/target
 
