@@ -25,7 +25,7 @@ for package_dir in sys.argv[1:]:
     data = f.read()
     
     name = re.findall('<name>([^<]+)', data)[0]
-    depends = re.findall('<[a-z_]*depend>([^<]+)', data)
+    depends = re.findall('<[a-z_]*depend[^>]*>([^<]+)', data)
 
     dependencies[name] = depends
 
