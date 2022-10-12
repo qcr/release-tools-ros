@@ -4,13 +4,20 @@ from __future__ import print_function
 import os
 import sys
 import re
+import pprint
 
 path = os.path.dirname(os.path.realpath(__file__))
 
 dependencies = {}
 paths = {}
 
-for package_dir in sys.argv[1:]:
+packages = sys.argv[1:]
+packages.sort(key=lambda x: len(x))
+
+for package_dir in packages:
+  if [x for x in paths.values() if package_dir.startswith(x + '/')]:
+    continue
+
   try:
     with open(os.path.join(path, package_dir, 'CMakeLists.txt')) as f:
       data = f.read()
@@ -24,13 +31,13 @@ for package_dir in sys.argv[1:]:
   with open(os.path.join(path, package_dir, 'package.xml')) as f:
     data = f.read()
     
-    name = re.findall('<name>([^<]+)', data)[0]
-    depends = re.findall('<[a-z_]*depend[^>]*>([^<]+)', data)
+    name = re.findall(r'<name>([^<]+)', data)[0]
+    depends = [match for a, b, c, match in re.findall('<([a-z_]*depend)( version_gte="[^"]*")?( condition="\$ROS_PYTHON_VERSION == 3")?>([^<]+)', data) if not (a.startswith('exec') or a.startswith('run'))]
 
     dependencies[name] = depends
 
     paths[name] = package_dir
-    
+
 package_names = list(dependencies.keys())
 
 for package in dependencies:

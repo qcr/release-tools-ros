@@ -31,6 +31,7 @@ ln -s $PWD $WORKSPACE/src
 ROS_PACKAGES=$(dirname $(find $WORKSPACE/src/ | grep package.xml$) 2>/dev/null)
 
 ORDERED=$($WORKSPACE/generate-list $ROS_PACKAGES)
+echo "${ORDERED[@]}"
 
 mkdir -p $WORKSPACE/target
 
@@ -41,12 +42,18 @@ fi
 wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/$(lsb_release -sc)/sources.yaml
 sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
 
-touch $WORKSPACE/target/local-sources.yaml
-
 apt-get update
 
 DATE=$(date "+%Y%m%d")
 TIME=$(date "+%H%M%S")
+
+for i in $ORDERED
+do
+	pushd $i
+	PACKAGE_NAME=$(cat package.xml | grep -o "<name>[^<]*" | awk '{print substr($1,7)}')
+	$WORKSPACE/update-sources $WORKSPACE/target/robotics-sources.yaml $PACKAGE_NAME $ROS_DISTRO
+	popd
+done
 
 for i in $ORDERED
 do
@@ -70,11 +77,14 @@ do
 		exit 1
 	fi
 
+	sed -i 's/) ; urgency=high/\) RELEASED; urgency=high/g' debian/changelog
+        sed -i 's/$(BUILD_TESTING_ARG)/-DBUILD_TESTING=OFF -DCATKIN_ENABLE_TESTING=OFF/g' debian/rules
+
 	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
 	sed -i "s/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO'/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO' -DCMAKE_BUILD_TYPE=Release/g" debian/rules
-	
+
 	fakeroot debian/rules binary
-	
+
 	if [ "$?" != "0" ]; then
 		echo "Failed to build package in $i"
 		clean_up
@@ -83,15 +93,12 @@ do
 
 	clean_up
 	cd ..
-	
-	ARTEFACT=$(ls | grep *.deb)
+
+	ARTEFACT=$(ls *.deb | grep -v dbgsym)
 	APT_PACKAGE_NAME=$(dpkg --field $ARTEFACT | grep "Package: " | awk '{print $2}')
 
 	dpkg --unpack $ARTEFACT
 
-	$WORKSPACE/update-sources $WORKSPACE/target/robotics-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
-	$WORKSPACE/update-sources $WORKSPACE/target/local-sources.yaml $PACKAGE_NAME $APT_PACKAGE_NAME
-	
 	mv *.deb $WORKSPACE/target/
 
 	popd

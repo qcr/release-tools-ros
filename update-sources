@@ -4,10 +4,19 @@ from __future__ import print_function
 import sys
 import os
 import yaml
+import re
 
 sources = sys.argv[1]
 package = sys.argv[2]
-apt_name = sys.argv[3]
+ros_version = sys.argv[3]
+
+version = 'ubuntu'
+
+with open('/etc/os-release', 'r') as f:
+	data = f.read()
+	version = re.findall(r'^ID=(.*)', data, re.MULTILINE)[0]
+
+apt_name = 'ros-{}-{}'.format(ros_version, package.replace('_', '-'))
 
 with open(sources) as f:
 	data = yaml.load(f, Loader=yaml.SafeLoader)
@@ -18,11 +27,11 @@ with open(sources) as f:
 	if package not in data:
 		data[package] = {}
 
-	if 'ubuntu' not in data[package]:
-		data[package]['ubuntu'] = []
+	if version not in data[package]:
+		data[package][version] = []
 
-	if apt_name not in data[package]['ubuntu']:
-		data[package]['ubuntu'].append(apt_name)
+	if apt_name not in data[package][version]:
+		data[package][version].append(apt_name)
 
 with open(sources, 'w') as f:
 	yaml.dump(data, f)
