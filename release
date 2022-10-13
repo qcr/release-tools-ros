@@ -35,17 +35,17 @@ echo "${ORDERED[@]}"
 
 mkdir -p $WORKSPACE/target
 
-if [ -e $WORKSPACE/target/robotics-sources.yaml ]; then
-        rm $WORKSPACE/target/robotics-sources.yaml
-fi
-
-wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/$(lsb_release -sc)/sources.yaml
-sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
+#if [ ! -e $WORKSPACE/target/robotics-sources.yaml ]; then
+#        wget -O $WORKSPACE/target/robotics-sources.yaml https://raw.githubusercontent.com/qcr/package_lists/master/$(lsb_release -sc)/sources.yaml#
+#	sed -i "1iyaml file://$WORKSPACE/target/robotics-sources.yaml" /etc/ros/rosdep/sources.list.d/20-default.list
+#fi
 
 apt-get update
 
 DATE=$(date "+%Y%m%d")
 TIME=$(date "+%H%M%S")
+
+export PYTHONPATH=$PYTHONPATH:/opt/ros/$ROS_DISTRO/lib/python3/dist-packages/
 
 for i in $ORDERED
 do
@@ -55,6 +55,9 @@ do
 	popd
 done
 
+#rosdep update
+#rosdep install -r --from-paths src --ignore-src -r -y
+
 for i in $ORDERED
 do
 	pushd $i
@@ -62,14 +65,13 @@ do
 	PACKAGE_NAME=$(cat package.xml | grep -o "<name>[^<]*" | awk '{print substr($1,7)}')
 	echo "Building $PACKAGE_NAME"
 
-	rosdep update
-	rosdep install -y --from-paths .
+	#rosdep install -y --from-paths .
 
-	bloom-generate rosdebian --place-template-files
-	if [ -d templates ]; then
-		for f in $(ls templates/); do if [[ "$f" == *.em ]]; then cp templates/$f debian/$f; fi; done;
-	fi
-	bloom-generate rosdebian --process-template-files
+	#bloom-generate rosdebian --place-template-files
+	#if [ -d templates ]; then
+	#for f in $(ls templates/); do if [[ "$f" == *.em ]]; then cp templates/$f debian/$f; fi; done;
+	#fi
+	bloom-generate rosdebian
 
 	if [ "$?" != "0" ]; then
 		echo "Failed to build package in $i"
@@ -77,10 +79,14 @@ do
 		exit 1
 	fi
 
+        if [ "$PACKAGE_NAME" == "catkin" ]; then
+                sed -i 's/DCATKIN_BUILD_BINARY_PACKAGE="1"/DCATKIN_BUILD_BINARY_PACKAGE="0"/g' debian/rules
+        fi
+
 	sed -i 's/) ; urgency=high/\) RELEASED; urgency=high/g' debian/changelog
         sed -i 's/$(BUILD_TESTING_ARG)/-DBUILD_TESTING=OFF -DCATKIN_ENABLE_TESTING=OFF/g' debian/rules
 
-	sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
+	#sed -i "s/(\([^\)]*\)/(\1.$DATE.$TIME/" debian/changelog
 	sed -i "s/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO'/-DCMAKE_INSTALL_PREFIX='\/opt\/ros\/$ROS_DISTRO' -DCMAKE_BUILD_TYPE=Release/g" debian/rules
 
 	fakeroot debian/rules binary
